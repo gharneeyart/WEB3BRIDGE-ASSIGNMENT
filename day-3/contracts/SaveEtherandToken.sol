@@ -8,6 +8,7 @@ pragma solidity ^0.8.3;
 // withdraw their savings
 
 interface IERC20 {
+    function transferFrom(address from, address to, uint256 value) external returns (bool);
     function transfer(address to, uint256 value) external returns (bool);
 }
 
@@ -37,15 +38,17 @@ contract SaveEtherandToken{
 
     function depositToken(address _token, uint256 _amount) external {
         require(_amount > 0, "Can't deposit zero value");
-        tokenBalances[msg.sender] = tokenBalances[msg.sender] + _amount;
+        bool result = IERC20(_token).transferFrom(msg.sender, address(this), _amount);
+        require(result, "transfer failed");
+        tokenBalances[msg.sender][_token] = tokenBalances[msg.sender][_token] + _amount;
         emit DepositToken(_token, msg.sender, _amount);
     }
 
     function withdrawToken(address _token, uint256 _amount) external {
         require(msg.sender != address(0), "Address zero detected");
-        uint256 userSavings_ = tokenBalances[msg.sender];
+        uint256 userSavings_ = tokenBalances[msg.sender][_token];
         require(userSavings_ > 0, "Insufficient funds");
-        tokenBalances[msg.sender] = userSavings_ - _amount;
+        tokenBalances[msg.sender][_token] = userSavings_ - _amount;
         bool result = IERC20(_token).transfer(msg.sender, _amount);
         require(result, "transfer failed");
         emit WithdrawToken(_token, msg.sender, _amount);
