@@ -8,7 +8,6 @@ pragma solidity ^0.8.3;
 // withdraw their savings
 
 interface IERC20 {
-    function transferFrom(address from, address to, uint256 value) external returns (bool);
     function transfer(address to, uint256 value) external returns (bool);
 }
 
