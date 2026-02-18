@@ -14,7 +14,7 @@ contract ERC20{
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
-    constructor(string _name, string _symbol, uint8 _decimals, uint256 _totalSupply){
+    constructor(string memory _name, string memory _symbol, uint8 _decimals, uint256 _totalSupply){
         name = _name;
         symbol = _symbol;
         decimals = _decimals;
@@ -31,7 +31,7 @@ contract ERC20{
         require(_to != address(0), "!ZA");
         require((_balances[msg.sender] >= _value) &&  (_balances[msg.sender] > 0), "Not enough balance");
         _balances[msg.sender] = _balances[msg.sender] - _value;
-        _balances[to] = _balances[to] + _value;
+        _balances[_to] = _balances[_to] + _value;
         emit Transfer(msg.sender, _to, _value);
         return true;
     }
@@ -57,4 +57,17 @@ contract ERC20{
     function allowance(address _owner, address _spender) public view returns (uint256){
         return _allowances[_spender][_owner];
     }
+
+    function mint(uint256 _amount) public {
+        _balances[msg.sender] = _balances[msg.sender] + _amount;
+        totalSupply = totalSupply + _amount;
+        emit Transfer(address(0), msg.sender, _amount);
+    }
+
+    function burn(uint256 _amount) public {
+        _balances[msg.sender] = _balances[msg.sender] - _amount;
+        totalSupply = totalSupply - _amount;
+        emit Transfer(msg.sender, address(0), _amount);
+    }
+
 }
