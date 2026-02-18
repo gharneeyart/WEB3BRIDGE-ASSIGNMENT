@@ -58,16 +58,4 @@ contract ERC20{
         return _allowances[_spender][_owner];
     }
 
-    function mint(uint256 _amount) public {
-        _balances[msg.sender] = _balances[msg.sender] + _amount;
-        totalSupply = totalSupply + _amount;
-        emit Transfer(address(0), msg.sender, _amount);
-    }
-
-    function burn(uint256 _amount) public {
-        _balances[msg.sender] = _balances[msg.sender] - _amount;
-        totalSupply = totalSupply - _amount;
-        emit Transfer(msg.sender, address(0), _amount);
-    }
-
 }
