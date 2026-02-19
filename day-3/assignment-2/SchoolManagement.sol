@@ -90,7 +90,7 @@ contract SchoolManagement {
         Staff storage staff = staffs[_staffId];
         require(staff.wallet != address(0), "Staff not found");
    
-        require(IERC20(token).transferFrom(address(this), staff.wallet, staff.salary), "Payment failed");
+        require(IERC20(token).transfer(staff.wallet, staff.salary), "Payment failed");
         
 
         staff.paidAt = block.timestamp;
