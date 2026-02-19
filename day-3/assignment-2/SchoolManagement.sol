@@ -74,7 +74,7 @@ contract SchoolManagement {
         require(bytes(_name).length > 0, "Empty name");
         require(_salary > 0, "Salary > 0");
 
-        id = staffCount + 1;
+        id = staffCount++;
         staffs[id] = Staff(id, _name, _wallet, _salary, 0);
         emit StaffRegistered(id, _wallet,_name, _salary);
     }
