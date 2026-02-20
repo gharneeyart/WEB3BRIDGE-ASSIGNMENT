@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.3;
+import {IERC20} from "./IERC20.sol";
 // Create a School management system where people can:
 // Register students & Staffs.
 // Pay School fees on registration using ERC20.
@@ -8,13 +9,6 @@ pragma solidity ^0.8.3;
 // Get all Staffs.
 // Pricing is based on grade / levels from 100 - 400 level.
 // Payment status can be updated once the payment is made which should include the timestamp.
-
-
-interface IERC20 {
-    function transferFrom(address from, address to, uint256 value) external returns (bool);
-    function transfer(address to, uint256 value) external returns (bool);
-    // function balanceOf(address _owner) public view returns (uint256)
-}
 
 contract SchoolManagement {
     address public owner;
@@ -45,6 +39,8 @@ contract SchoolManagement {
 
     uint256 public studentCount;
     uint256 public staffCount;
+
+    Staff[] public allStaffs;
     
     event StudentRegistered(uint256 indexed _studentId, address indexed _walletAddress, string _studentName, Level _level);
     event StaffRegistered(uint256 indexed _staffId, address indexed _walletAddress, string _staffName, uint256 _salary);
@@ -61,6 +57,9 @@ contract SchoolManagement {
         levelFees[Level.L200] = fees[1];
         levelFees[Level.L300] = fees[2];
         levelFees[Level.L400] = fees[3];
+
+        studentCount = 1;
+        staffCount = 1;
     }
 
     modifier onlyOwner(){
@@ -75,27 +74,25 @@ contract SchoolManagement {
         require(_salary > 0, "Salary > 0");
 
         id = staffCount++;
-        staffs[id] = Staff(id, _name, _wallet, _salary, 0);
+        Staff memory staff = Staff(id, _name, _wallet, _salary, 0);
+        allStaffs.push(staff);
         emit StaffRegistered(id, _wallet,_name, _salary);
     }
+
     function getAllStaff() external view returns(Staff[] memory) {
-        Staff[] memory list = new Staff[](staffCount);
-        for (uint256 i = 1; i <= staffCount; i++) {
-            list[i - 1] = staffs[i];
-        }
-        return list;
+      return allStaffs;
     }
 
-    function paySalary(uint256 _staffId) external onlyOwner{
-        Staff storage staff = staffs[_staffId];
-        require(staff.wallet != address(0), "Staff not found");
-   
-        require(IERC20(token).transfer(staff.wallet, staff.salary), "Payment failed");
-        
+    function paySalary(uint256 _staffId) external onlyOwner {
+        require(_staffId < allStaffs.length, "Staff not found");
 
-        staff.paidAt = block.timestamp;
-        emit SalaryPaid(_staffId, staff.salary, block.timestamp);
+        require(staffs[_staffId].wallet != address(0), "Staff not found");
+        require(IERC20(token).transferFrom(msg.sender, staffs[_staffId].wallet, staffs[_staffId].salary), "Payment failed");
+
+        staffs[_staffId].paidAt = block.timestamp;
+        emit SalaryPaid(_staffId, staffs[_staffId].salary, block.timestamp);
     }
+
 
     function registerSudent( string calldata _name, Level _level) external returns(uint256 id) {
         require(bytes(_name).length > 0, "Empty name");
@@ -119,6 +116,10 @@ contract SchoolManagement {
 
     function getStudent(uint256 _id) external view returns(Student memory){
         return students[_id];
+    }
+
+    function contractTokenBalance() external view returns(uint256){
+        return IERC20(token).balanceOf(address(this));
     }
 
 

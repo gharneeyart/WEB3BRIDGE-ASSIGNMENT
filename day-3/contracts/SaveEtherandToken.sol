@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.3;
+
+import {IERC20} from "./IERC20.sol";
 // Write a smart contract that can save both ERC20 and ether for a user.
 
 // Users must be able to:
@@ -7,50 +9,81 @@ pragma solidity ^0.8.3;
 // deposit or save in the contract.
 // withdraw their savings
 
-interface IERC20 {
-    function transferFrom(address from, address to, uint256 value) external returns (bool);
-    function transfer(address to, uint256 value) external returns (bool);
-}
+contract SavingEtherandToken{
+    address token;
 
-contract SaveEtherandToken{
     mapping(address => uint256) public etherBalances;
-    mapping(address => mapping(address => uint256)) public tokenBalances;
+    mapping(address => uint256) public tokenBalances;
 
-    event DepositEther(address indexed user, uint256 amount);
-    event WithdrawEther(address indexed user, uint256 amount, bytes data);
-    event DepositToken(address indexed token, address indexed user, uint256 amount);
-    event WithdrawToken(address indexed token, address indexed user, uint256 amount);
+    event DepositSuccessful(address indexed sender, uint256 indexed amount);
+
+    event WithdrawalSuccessful(address indexed receiver, uint256 indexed amount, bytes data);
+
+    constructor(address _token){
+        token = _token;
+    }
 
     function depositEther() external payable {
         require(msg.value > 0, "Can't deposit zero value");
         etherBalances[msg.sender] = etherBalances[msg.sender] + msg.value;
-        emit DepositEther(msg.sender, msg.value);
+        emit DepositSuccessful(msg.sender, msg.value);
     }
+
     function withdrawEther(uint256 _amount) external {
         require(msg.sender != address(0), "Address zero detected");
+
         uint256 userSavings_ = etherBalances[msg.sender];
+
         require(userSavings_ > 0, "Insufficient funds");
+
         etherBalances[msg.sender] = userSavings_ - _amount;
+
         (bool result, bytes memory data) = payable(msg.sender).call{value: _amount}("");
+
         require(result, "transfer failed");
-        emit WithdrawEther(msg.sender, _amount, data);
+
+        emit WithdrawalSuccessful(msg.sender, _amount, data);
     }
 
-    function depositToken(address _token, uint256 _amount) external {
+        function getUserEherSavings() external view returns (uint256) {
+        return etherBalances[msg.sender];
+    }
+
+    function depositToken(uint256 _amount) external {
         require(_amount > 0, "Can't deposit zero value");
-        bool result = IERC20(_token).transferFrom(msg.sender, address(this), _amount);
+
+        require(IERC20(token).balanceOf(msg.sender) >= _amount, "Insufficient funds");
+
+        tokenBalances[msg.sender] = tokenBalances[msg.sender] + _amount;
+
+        bool result = IERC20(token).transferFrom(msg.sender, address(this), _amount);
+
         require(result, "transfer failed");
-        tokenBalances[msg.sender][_token] = tokenBalances[msg.sender][_token] + _amount;
-        emit DepositToken(_token, msg.sender, _amount);
+
+        emit DepositSuccessful(msg.sender, _amount);
     }
 
-    function withdrawToken(address _token, uint256 _amount) external {
+    function withdrawToken(uint256 _amount) external {
         require(msg.sender != address(0), "Address zero detected");
-        uint256 userSavings_ = tokenBalances[msg.sender][_token];
-        require(userSavings_ > 0, "Insufficient funds");
-        tokenBalances[msg.sender][_token] = userSavings_ - _amount;
-        bool result = IERC20(_token).transfer(msg.sender, _amount);
+
+        uint256 userSavings_ = tokenBalances[msg.sender];
+
+        require(userSavings_ >= _amount, "Insufficient funds");
+
+        tokenBalances[msg.sender] = userSavings_ - _amount;
+
+        bool result = IERC20(token).transfer(msg.sender, _amount);
+
         require(result, "transfer failed");
-        emit WithdrawToken(_token, msg.sender, _amount);
+
+        emit WithdrawalSuccessful(msg.sender, _amount, "");
+    }
+
+    function getTokenBalance() external view returns (uint256) {
+        return tokenBalances[msg.sender];
+    }
+
+    function getContractBalance() external view returns (uint256) {
+        return address(this).balance;
     }
 }
