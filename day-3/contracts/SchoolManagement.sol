@@ -14,13 +14,12 @@ contract SchoolManagement {
     address public owner;
     address public token;
 
-    enum Level{L100, L200, L300, L400}
 
     struct Student {
         uint256 id;
         string name;
         address wallet;
-        Level level;
+        uint256 level;
         bool paid;
         uint256 paidAt;
     }
@@ -31,32 +30,34 @@ contract SchoolManagement {
         address wallet;
         uint256 salary;
         uint256 paidAt;
+        bool suspended;
     }
 
     mapping(uint256 => Student) public students;
     mapping(uint256 => Staff) public staffs;
-    mapping(Level => uint256) public levelFees;
+    mapping(uint256 => uint256) public levelFees;
 
     uint256 public studentCount;
     uint256 public staffCount;
 
     Staff[] public allStaffs;
+    Student[] public allStudents;
     
-    event StudentRegistered(uint256 indexed _studentId, address indexed _walletAddress, string _studentName, Level _level);
+    event StudentRegistered(uint256 indexed _studentId, address indexed _walletAddress, string _studentName, uint256 _level);
     event StaffRegistered(uint256 indexed _staffId, address indexed _walletAddress, string _staffName, uint256 _salary);
     event FeePaid(uint256 _studentId, uint256 _amount, uint256 timestamp);
     event SalaryPaid(uint256 _staffId, uint256 _amount, uint256 timestamp);
-    event LevelFeeUpdated(Level level, uint256 newFee);
+    event LevelFeeUpdated(uint256 level, uint256 newFee);
 
-    constructor(address _token, uint256[4] memory fees){
+    constructor(address _token){
         owner = msg.sender;
         require(_token != address(0), "Zero token address");
         token = _token;
 
-        levelFees[Level.L100] = fees[0];
-        levelFees[Level.L200] = fees[1];
-        levelFees[Level.L300] = fees[2];
-        levelFees[Level.L400] = fees[3];
+        levelFees[100] = 10 * 10**18;  
+        levelFees[200] = 15 * 10**18;  
+        levelFees[300] = 20 * 10**18;
+        levelFees[400] = 25 * 10**18;
 
         studentCount = 1;
         staffCount = 1;
@@ -66,7 +67,6 @@ contract SchoolManagement {
         require(msg.sender == owner, "Only Owner");
         _;
     }
-
   
     function registerStaff( string calldata _name, address _wallet, uint256 _salary) external onlyOwner returns(uint256 id) {
         require(_wallet != address(0), "Zero wallet address");
@@ -74,7 +74,8 @@ contract SchoolManagement {
         require(_salary > 0, "Salary > 0");
 
         id = staffCount++;
-        Staff memory staff = Staff(id, _name, _wallet, _salary, 0);
+        Staff memory staff = Staff(id, _name, _wallet, _salary, 0, false);
+        staffs[id] = staff;
         allStaffs.push(staff);
         emit StaffRegistered(id, _wallet,_name, _salary);
     }
@@ -83,13 +84,27 @@ contract SchoolManagement {
       return allStaffs;
     }
 
- function paySalary(uint256 _staffId) external onlyOwner {
+    function suspendStaff(uint256 _staffId, bool _suspend) external onlyOwner returns(bool) {
+        require(staffs[_staffId].wallet != address(0), "Student not found");
+
+        staffs[_staffId].suspended = _suspend;
+        
+        for(uint i; i < allStaffs.length; i++){
+            if(allStaffs[i].id == _staffId){
+                allStaffs[i].suspended = _suspend;
+            }
+        }
+        return true;
+    }
+
+
+  function paySalary(uint256 _staffId) external onlyOwner {
         require(staffs[_staffId].wallet != address(0), "Staff not found");
+        require(staffs[_staffId].suspended == false, "Staff has been suspended");
         
-        address staffWallet = staffs[_staffId].wallet;
         uint256 salary = staffs[_staffId].salary;
-        
-        require(IERC20(token).transferFrom(msg.sender, staffWallet, salary), "Payment failed");
+
+        require(IERC20(token).transfer(staffs[_staffId].wallet, staffs[_staffId].salary), "Payment failed");
 
         staffs[_staffId].paidAt = block.timestamp;
         
@@ -103,14 +118,14 @@ contract SchoolManagement {
         emit SalaryPaid(_staffId, salary, block.timestamp);
     }
 
-
-    function registerSudent( string calldata _name, Level _level) external returns(uint256 id) {
-        require(bytes(_name).length > 0, "Empty name");
+    function registerSudent( string calldata _name, uint256 _level) external returns(uint256 id) {
+      require(bytes(_name).length > 0, "Empty name");
 
         id = studentCount++;
         students[id] = Student(id, _name, msg.sender, _level,false, 0);
 
         Student storage student = students[id];
+
         require(student.wallet != address(0), "Student not found");
         require(!student.paid, "Already paid");
         require(msg.sender == student.wallet, "Not student");
@@ -120,8 +135,23 @@ contract SchoolManagement {
 
         student.paid = true;
         student.paidAt = block.timestamp;
+        allStudents.push(student);
         emit FeePaid(id, amount, block.timestamp);
         emit StudentRegistered(id, msg.sender,_name, _level);
+    }
+
+    function removeStudent(uint256 _id) external {
+        require(students[_id].wallet != address(0), "Student not found");
+        
+        // address studentWallet = students[_id].wallet;
+        
+        for(uint i; i < allStudents.length; i++) {
+            if(allStudents[i].id == _id) {
+                allStudents[i] = allStudents[allStudents.length - 1];
+                allStudents.pop();
+            }
+        }
+        delete students[_id];
     }
 
     function getStudent(uint256 _id) external view returns(Student memory){

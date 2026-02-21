@@ -9,7 +9,7 @@ import {IERC20} from "./IERC20.sol";
 // deposit or save in the contract.
 // withdraw their savings
 
-contract SavingEtherandToken{
+contract SaveAsset{
     address token;
 
     mapping(address => uint256) public etherBalances;
