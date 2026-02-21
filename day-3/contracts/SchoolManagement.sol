@@ -162,6 +162,11 @@ contract SchoolManagement {
         return IERC20(token).balanceOf(address(this));
     }
 
+     function updateLevelFee(Level _level, uint256 _newFee) external onlyOwner {
+        levelFees[_level] = _newFee;
+        emit LevelFeeUpdated(_level, _newFee);
+    }
+
 
 
     
