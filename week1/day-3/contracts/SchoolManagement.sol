@@ -140,10 +140,8 @@ contract SchoolManagement {
         emit StudentRegistered(id, msg.sender,_name, _level);
     }
 
-    function removeStudent(uint256 _id) external {
+    function removeStudent(uint256 _id) external onlyOwner(){
         require(students[_id].wallet != address(0), "Student not found");
-        
-        // address studentWallet = students[_id].wallet;
         
         for(uint i; i < allStudents.length; i++) {
             if(allStudents[i].id == _id) {
@@ -162,7 +160,7 @@ contract SchoolManagement {
         return IERC20(token).balanceOf(address(this));
     }
 
-     function updateLevelFee(Level _level, uint256 _newFee) external onlyOwner {
+     function updateLevelFee(uint256 _level, uint256 _newFee) external onlyOwner {
         levelFees[_level] = _newFee;
         emit LevelFeeUpdated(_level, _newFee);
     }

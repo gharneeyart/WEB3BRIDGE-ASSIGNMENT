@@ -45,7 +45,7 @@ contract SaveAsset{
         emit WithdrawalSuccessful(msg.sender, _amount, data);
     }
 
-        function getUserEherSavings() external view returns (uint256) {
+    function getUserEtherSavings() external view returns (uint256) {
         return etherBalances[msg.sender];
     }
 
