@@ -20,6 +20,7 @@ const main = async () => {
   const USDC = await ethers.getContractAt("IERC20", USDCAddress, impersonatedSigner);
   const LPToken = await ethers.getContractAt("IERC20", USDCWETHPairAddress, impersonatedSigner);
   const ROUTER = await ethers.getContractAt("IUniswapV2Router", UNIRouter, impersonatedSigner);
+  const PermitToken = await ethers.getContractAt("IERC20Permit", USDCWETHPairAddress, impersonatedSigner);
 
   await USDC.approve(UNIRouter, amountUSDC);
 
@@ -30,7 +31,7 @@ const main = async () => {
     amountETHMin,
     impersonatedSigner.address,
     deadline,
-    { value: amountETH } // ✅ send ETH along with the transaction
+    { value: amountETH } 
   );
   await addTx.wait();
   console.log("Liquidity added. LP tokens acquired.");
@@ -60,12 +61,11 @@ const main = async () => {
   deadline
 );
 
-  // ✅ Correct usage: removeLiquidityETH(token, liquidity, amountTokenMin, amountETHMin, to, deadline)
   const tx = await ROUTER.removeLiquidityETHWithPermit(
-    USDCAddress,          // token (not ETH side)
-    liquidityToRemove,    // LP tokens to burn
-    amountUSDCMinRemove,  // min USDC to receive
-    amountETHMinRemove,   // min ETH to receive
+    USDCAddress,          
+    liquidityToRemove,    
+    amountUSDCMinRemove,  
+    amountETHMinRemove,   
     impersonatedSigner.address,
     deadline,
     false,
