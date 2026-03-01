@@ -170,5 +170,39 @@ describe("Uniswap V2: swapExactTokensForTokens", function () {
             expect(wethBalanceBefore - wethBalanceAfter).to.be.lte(ethers.parseEther("1"));
         
         })
- 
+
+        it("should swapExactETHForTokens", async function(){
+            const { impersonatedSigner, USDC, ROUTER, deadline } = await deployUniswapV2Router();
+
+            const amountOutMin = ethers.parseUnits("1000", 6);
+            const path = [WETHAddress, USDCAddress];
+
+            const usdcBalanceBefore = await USDC.balanceOf(impersonatedSigner.address);
+            const wethBalanceBefore = await ethers.provider.getBalance(impersonatedSigner.address);
+            console.log("WETH Balance before swap:", Number(wethBalanceBefore));
+            console.log("USDC Balance before swap:", Number(usdcBalanceBefore));
+
+            const transaction = await ROUTER.swapExactETHForTokens(
+                amountOutMin,
+                path,
+                impersonatedSigner,
+                deadline,
+                {
+                value: ethers.parseEther("0.7"),
+                }
+            );
+
+            await transaction.wait();
+
+            const usdcBalanceAfter = await USDC.balanceOf(impersonatedSigner.address);
+            const wethBalanceAfter = await ethers.provider.getBalance(impersonatedSigner.address);
+            console.log("WETH Balance after swap:", Number(wethBalanceAfter));
+            console.log("USDC Balance after swap:", Number(usdcBalanceAfter));
+
+            expect(wethBalanceAfter).to.be.lt(wethBalanceBefore);
+            expect(usdcBalanceAfter).to.be.gt(usdcBalanceBefore);
+            expect(usdcBalanceAfter - usdcBalanceBefore).to.be.gte(amountOutMin);
+        })
+
 });
+ 
