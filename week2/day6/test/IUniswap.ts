@@ -68,5 +68,40 @@ describe("Uniswap V2: swapExactTokensForTokens", function () {
             expect(usdcBalanceAfter).to.be.lt(usdcBalanceBefore);  
             expect(usdcBalanceBefore - usdcBalanceAfter).to.equal(amountIn);
         })});
+
+        it("swapTokensForExactTokens", async function(){
+            const { impersonatedSigner, USDC, DAI, ROUTER, deadline } = await deployUniswapV2Router();
+
+            const amountOut = ethers.parseUnits("100", 18);
+            const amountInMax = ethers.parseUnits("110", 6);
+            const path = [USDCAddress, DAIAddress];
+
+            await USDC.approve(UNIRouter, amountInMax);
+
+            const daiBalanceBefore = await DAI.balanceOf(impersonatedSigner.address);
+            console.log("DAI Balance before swap:", Number(daiBalanceBefore));
+            const usdcBalanceBefore = await USDC.balanceOf(impersonatedSigner.address);
+            console.log("USDC Balance before swap:", Number(usdcBalanceBefore));
+
+            const tx = await ROUTER.swapTokensForExactTokens(
+                amountOut,
+                amountInMax,
+                path,
+                impersonatedSigner.address,
+                deadline
+            );
+            await tx.wait();
+
+            const daiBalanceAfter = await DAI.balanceOf(impersonatedSigner.address);
+            console.log("DAI Balance after swap:", Number(daiBalanceAfter));
+            expect(daiBalanceAfter).to.be.gt(daiBalanceBefore);  
+            const usdcBalanceAfter = await USDC.balanceOf(impersonatedSigner.address);
+            console.log("USDC Balance after swap:", Number(usdcBalanceAfter));
+
+            expect(usdcBalanceAfter).to.be.lt(usdcBalanceBefore);  
+            expect(usdcBalanceBefore - usdcBalanceAfter).to.be.lte(amountInMax);
+            expect(daiBalanceAfter - daiBalanceBefore).to.equal(amountOut);
+
+        })
  
 });
