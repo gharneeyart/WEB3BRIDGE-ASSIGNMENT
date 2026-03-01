@@ -1,13 +1,43 @@
-# Sample Hardhat Project
+# UniswapV2Router Scripts Results
+<details>
+<summary>swapExactTokensForTokens</summary>
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a Hardhat Ignition module that deploys that contract.
+![Alt text](/week2/day6/screenshots/swapExactTokensForTokens.png)
+</details>
+<details>
+<summary>swapTokensForExactTokens</summary>
 
-Try running some of the following tasks:
+![Alt text](/week2/day6/screenshots/swapTokensForExactTokens.png)
+</details>
+<details>
+<summary>swapTokensForExactETH</summary>
 
-```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat ignition deploy ./ignition/modules/Lock.ts
-```
+![Alt text](/week2/day6/screenshots/swapTokensForExactETH.png)
+</details>
+<details>
+
+<summary>swapETHForExactTokens</summary>
+
+![Alt text](/week2/day6/screenshots/swapETHForExactTokens.png)
+</details>
+<details>
+<summary>swapExactETHForTokens</summary>
+
+![Alt text](/week2/day6/screenshots/swapExactETHForTokens.png)
+</details>
+<details>
+<summary>addLiquidityETH</summary>
+
+![Alt text](/week2/day6/screenshots/addLiquidityETH.png)
+</details>
+<details>
+<summary>removeLiquidity</summary>
+
+![Alt text](/week2/day6/screenshots/removeLiquidity.png)
+</details>
+<details>
+<summary>removeLiquidityETH</summary>
+
+![Alt text](/week2/day6/screenshots/removeLiquidityETH.png)
+</details>
+
