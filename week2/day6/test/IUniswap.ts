@@ -3,7 +3,7 @@ import { network } from "hardhat";
 import { ethers } from "hardhat";
 const helpers = require("@nomicfoundation/hardhat-network-helpers");
 
-describe("Uniswap V2: swapExactTokensForTokens", function () {
+describe("Uniswap V2", function () {
     const USDCAddress = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
     const DAIAddress = "0x6B175474E89094C44Da98b954EedeAC495271d0F";
     const WETHAddress = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2";
@@ -43,9 +43,7 @@ describe("Uniswap V2: swapExactTokensForTokens", function () {
             await USDC.approve(UNIRouter, amountIn);
 
             const daiBalanceBefore = await DAI.balanceOf(impersonatedSigner.address);
-            console.log("DAI Balance before swap:", Number(daiBalanceBefore));
             const usdcBalanceBefore = await USDC.balanceOf(impersonatedSigner.address);
-            console.log("USDC Balance before swap:", Number(usdcBalanceBefore));
 
             const tx = await ROUTER.swapExactTokensForTokens(
                 amountIn,
@@ -57,11 +55,9 @@ describe("Uniswap V2: swapExactTokensForTokens", function () {
             await tx.wait();
 
             const daiBalanceAfter = await DAI.balanceOf(impersonatedSigner.address);
-            console.log("DAI Balance after swap:", Number(daiBalanceAfter));
-            expect(daiBalanceAfter).to.be.gt(daiBalanceBefore);  
             const usdcBalanceAfter = await USDC.balanceOf(impersonatedSigner.address);
-            console.log("USDC Balance after swap:", Number(usdcBalanceAfter));
 
+            expect(daiBalanceAfter).to.be.gt(daiBalanceBefore);  
             expect(usdcBalanceAfter).to.be.lt(usdcBalanceBefore);  
             expect(usdcBalanceBefore - usdcBalanceAfter).to.equal(amountIn);
         })});
@@ -76,9 +72,7 @@ describe("Uniswap V2: swapExactTokensForTokens", function () {
             await USDC.approve(UNIRouter, amountInMax);
 
             const daiBalanceBefore = await DAI.balanceOf(impersonatedSigner.address);
-            console.log("DAI Balance before swap:", Number(daiBalanceBefore));
             const usdcBalanceBefore = await USDC.balanceOf(impersonatedSigner.address);
-            console.log("USDC Balance before swap:", Number(usdcBalanceBefore));
 
             const tx = await ROUTER.swapTokensForExactTokens(
                 amountOut,
@@ -90,11 +84,9 @@ describe("Uniswap V2: swapExactTokensForTokens", function () {
             await tx.wait();
 
             const daiBalanceAfter = await DAI.balanceOf(impersonatedSigner.address);
-            console.log("DAI Balance after swap:", Number(daiBalanceAfter));
-            expect(daiBalanceAfter).to.be.gt(daiBalanceBefore);  
             const usdcBalanceAfter = await USDC.balanceOf(impersonatedSigner.address);
-            console.log("USDC Balance after swap:", Number(usdcBalanceAfter));
 
+            expect(daiBalanceAfter).to.be.gt(daiBalanceBefore);  
             expect(usdcBalanceAfter).to.be.lt(usdcBalanceBefore);  
             expect(usdcBalanceBefore - usdcBalanceAfter).to.be.lte(amountInMax);
             expect(daiBalanceAfter - daiBalanceBefore).to.equal(amountOut);
@@ -112,8 +104,6 @@ describe("Uniswap V2: swapExactTokensForTokens", function () {
 
             const usdcBalanceBefore = await USDC.balanceOf(impersonatedSigner.address);
             const wethBalanceBefore = await ethers.provider.getBalance(impersonatedSigner.address);
-            console.log("WETH Balance before swap:", Number(wethBalanceBefore));
-            console.log("USDC Balance before swap:", Number(usdcBalanceBefore));
 
              const transaction = await ROUTER.swapTokensForExactETH(
                 amountOut,
@@ -127,8 +117,6 @@ describe("Uniswap V2: swapExactTokensForTokens", function () {
 
             const usdcBalanceAfter = await USDC.balanceOf(impersonatedSigner.address);
             const wethBalanceAfter = await ethers.provider.getBalance(impersonatedSigner.address);
-            console.log("WETH Balance after swap:", Number(wethBalanceAfter));
-            console.log("USDC Balance after swap:", Number(usdcBalanceAfter));
 
             expect(wethBalanceAfter).to.be.gt(wethBalanceBefore);  
             expect(usdcBalanceAfter).to.be.lt(usdcBalanceBefore);  
@@ -144,8 +132,6 @@ describe("Uniswap V2: swapExactTokensForTokens", function () {
 
             const usdcBalanceBefore = await USDC.balanceOf(impersonatedSigner.address);
             const wethBalanceBefore = await ethers.provider.getBalance(impersonatedSigner.address);
-            console.log("WETH Balance before swap:", Number(wethBalanceBefore));
-            console.log("USDC Balance before swap:", Number(usdcBalanceBefore));
 
             const transaction = await ROUTER.swapETHForExactTokens(
                 amountOut,
@@ -161,8 +147,6 @@ describe("Uniswap V2: swapExactTokensForTokens", function () {
 
             const usdcBalanceAfter = await USDC.balanceOf(impersonatedSigner.address);
             const wethBalanceAfter = await ethers.provider.getBalance(impersonatedSigner.address);
-            console.log("WETH Balance after swap:", Number(wethBalanceAfter));
-            console.log("USDC Balance after swap:", Number(usdcBalanceAfter));
 
             expect(wethBalanceAfter).to.be.lt(wethBalanceBefore);
             expect(usdcBalanceAfter).to.be.gt(usdcBalanceBefore);
@@ -179,8 +163,6 @@ describe("Uniswap V2: swapExactTokensForTokens", function () {
 
             const usdcBalanceBefore = await USDC.balanceOf(impersonatedSigner.address);
             const wethBalanceBefore = await ethers.provider.getBalance(impersonatedSigner.address);
-            console.log("WETH Balance before swap:", Number(wethBalanceBefore));
-            console.log("USDC Balance before swap:", Number(usdcBalanceBefore));
 
             const transaction = await ROUTER.swapExactETHForTokens(
                 amountOutMin,
@@ -196,12 +178,45 @@ describe("Uniswap V2: swapExactTokensForTokens", function () {
 
             const usdcBalanceAfter = await USDC.balanceOf(impersonatedSigner.address);
             const wethBalanceAfter = await ethers.provider.getBalance(impersonatedSigner.address);
-            console.log("WETH Balance after swap:", Number(wethBalanceAfter));
-            console.log("USDC Balance after swap:", Number(usdcBalanceAfter));
 
             expect(wethBalanceAfter).to.be.lt(wethBalanceBefore);
             expect(usdcBalanceAfter).to.be.gt(usdcBalanceBefore);
             expect(usdcBalanceAfter - usdcBalanceBefore).to.be.gte(amountOutMin);
+        })
+
+        it("should addLiquidity", async function(){
+            const { impersonatedSigner, USDC, DAI, ROUTER, deadline } = await deployUniswapV2Router();
+
+            const amountUSDC = ethers.parseUnits("10000", 6);
+            const amountDAI = ethers.parseUnits("10000", 18);
+            const amountUSDCMin = ethers.parseUnits("9000", 6);
+            const amountDAIMin = ethers.parseUnits("9000", 18);
+
+            await USDC.approve(ROUTER, amountUSDC);
+            await DAI.approve(ROUTER, amountDAI);
+
+            const usdcBalanceBefore = await USDC.balanceOf(impersonatedSigner.address);
+            const daiBalanceBefore = await DAI.balanceOf(impersonatedSigner.address);
+
+            const tx = await ROUTER.addLiquidity(
+                USDCAddress,
+                DAIAddress,
+                amountUSDC,
+                amountDAI,
+                amountUSDCMin,
+                amountDAIMin,
+                impersonatedSigner.address,
+                deadline,
+            );
+
+            await tx.wait();
+            const usdcBalanceAfter = await USDC.balanceOf(impersonatedSigner.address);
+            const daiBalanceAfter = await DAI.balanceOf(impersonatedSigner.address);
+
+            expect(usdcBalanceAfter).to.be.lt(usdcBalanceBefore);
+            expect(daiBalanceAfter).to.be.lt(daiBalanceBefore);
+            expect(usdcBalanceBefore - usdcBalanceAfter).to.be.gte(amountUSDCMin);
+            expect(daiBalanceBefore - daiBalanceAfter).to.be.gte(amountDAIMin);
         })
 
 });
