@@ -55,11 +55,12 @@ contract PropertyManagement{
     }
 
     function removeProperty(uint256 _propertyId) external onlyPropertyOwner(_propertyId){
-        delete properties[_propertyId];
+        // delete properties[_propertyId];
         for (uint8 i; i < allProperties.length; i++) {
             if (allProperties[i].propertyId == _propertyId) {
                 allProperties[i] = allProperties[allProperties.length - 1];
                 allProperties.pop();
+                break;
             }
         }
     }

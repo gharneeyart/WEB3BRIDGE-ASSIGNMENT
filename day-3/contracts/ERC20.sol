@@ -90,7 +90,7 @@ contract ERC20{
     }
 
     function allowance(address _owner, address _spender) external view returns (uint256){
-        return _allowances[_spender][_owner];
+        return _allowances[_owner][_spender];
     }
 
     function mint(address _owner, uint256 _amount) external {

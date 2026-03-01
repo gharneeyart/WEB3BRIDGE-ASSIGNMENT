@@ -1,0 +1,35 @@
+{
+  "name": "Cracked Dev #1",
+  "description": "A high-skill Web3 developer and security expert, mastering decentralized protocols in a high-tech, neon-lit workspace.",
+  "image": "ipfs://QmUUTZ8GBkYWns2Goiu5Hcy1omcFFA7PSuUmjT3uLBnEQb",
+  "attributes": [
+    {
+      "trait_type": "Character",
+      "value": "Black Muslim Young Lady"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Modern Hijab and Tech Blazer"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Cyberpunk HUD Glasses"
+    },
+    {
+      "trait_type": "Style",
+      "value": "Cinematic 3D Render"
+    },
+    {
+      "trait_type": "Environment",
+      "value": "Cyber Workspace"
+    },
+    {
+      "trait_type": "Status",
+      "value": "Protocol Breached"
+    },
+    {
+      "trait_type": "Specialty",
+      "value": "Web3 Security"
+    }
+  ]
+}
