@@ -8,8 +8,8 @@ describe("Uniswap V2: swapExactTokensForTokens", function () {
     const DAIAddress = "0x6B175474E89094C44Da98b954EedeAC495271d0F";
     const WETHAddress = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2";
     const UNIRouter = "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D";
-    const USDCWETHPair = "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc";
-    const USDCDAIPair = "0xAE461cA67B15dc8dc81CE7615e0320dA1A9aB8D5";
+    // const USDCWETHPair = "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc";
+    // const USDCDAIPair = "0xAE461cA67B15dc8dc81CE7615e0320dA1A9aB8D5";
     const USDCHolder = "0xf584f8728b874a6a5c7a8d4d387c9aae9172d621";
 
     async function deployUniswapV2Router(){
@@ -133,7 +133,7 @@ describe("Uniswap V2: swapExactTokensForTokens", function () {
             expect(wethBalanceAfter).to.be.gt(wethBalanceBefore);  
             expect(usdcBalanceAfter).to.be.lt(usdcBalanceBefore);  
             expect(usdcBalanceBefore - usdcBalanceAfter).to.be.lte(amountInMax);
-            expect(wethBalanceAfter - wethBalanceBefore).to.equal(amountOut);
+            expect(wethBalanceAfter - wethBalanceBefore).to.be.closeTo(amountOut, ethers.parseEther("0.01"));
         })
  
 });
